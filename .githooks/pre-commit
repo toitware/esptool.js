@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Copyright (C) 2021 Toitware ApS. All rights reserved.
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file.
+
+EXTENSIONS="*.ts *.ts *.js"
+
+new_files=$(git diff --name-only --diff-filter=A --cached -- $EXTENSIONS)
+
+for f in $new_files; do
+  if ! grep -L "Copyright .* Toitware" "$f" 2>&1 1>/dev/null; then
+    missing_copyright="$f $missing_copyright"
+  else
+    if ! grep -L "governed.*MIT" "$f"  2>&1 1>/dev/null; then
+      missing_mit="$f $missing_mit"
+    fi
+  fi
+done
+
+if [ -n "$missing_copyright" ]; then
+  echo "Missing copyright in:"
+  for f in $missing_copyright; do
+    echo "  $f"
+  done
+fi
+
+if [ -n "$missing_mit" ]; then
+  echo "Missing MIT line:"
+  for f in $missing_mit; do
+    echo "  $f"
+  done
+fi
+
+if [ -n "$missing_copyright" ] || [ -n "$missing_mit" ]; then
+  exit 1;
+fi
