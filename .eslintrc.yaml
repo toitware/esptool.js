@@ -1,0 +1,47 @@
+
+root: true
+parser: "@typescript-eslint/parser" # Specifies the ESLint parser
+parserOptions:
+  ecmaVersion: 6 # Allows for the parsing of modern ECMAScript features
+  sourceType: module # Allows for the use of imports
+  ecmaFeatures:
+    jsx: true # Allows for the parsing of JSX
+
+# TypeScript specific config here.
+overrides:
+  - files: [ "*.ts", "*.tsx" ]
+    parserOptions:
+      project: "./tsconfig.json"
+    extends:
+      # Uses the recommended rules from the @typescript-eslint/eslint-plugin
+      - plugin:@typescript-eslint/recommended
+      - plugin:@typescript-eslint/recommended-requiring-type-checking
+
+    rules:
+      # This fails for generics with FunctionalComponent, and is not necessary
+      # because other TS rules cover it anyway.
+      react/prop-types: "off"
+
+      "no-unused-vars": "off" # required for the typescript lint
+      # I decided to leave `args` at the deafult `after-used` but it might make
+      # sense to set this to `none`.
+      # https://eslint.org/docs/rules/no-unused-vars#args
+      "@typescript-eslint/no-unused-vars":  ["warn", { "vars": "local", "args": "after-used" }]
+
+      "@typescript-eslint/no-empty-function": "off"
+      "@typescript-eslint/no-var-requires": "off"
+
+
+settings:
+  react:
+    version: detect
+
+extends:
+  - prettier
+  # Enables eslint-plugin-prettier and eslint-config-prettier. This will display
+  # prettier errors as ESLint errors. Make sure this is always the last
+  # configuration in the extends array.
+  - plugin:prettier/recommended
+
+# Override rules for all files here.
+rules: {}

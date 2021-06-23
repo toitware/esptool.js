@@ -1,0 +1,33 @@
+{
+  "name": "esptool.js",
+  "version": "1.0.0",
+  "description": "TypeScript port of the esptool",
+  "main": "build/index.js",
+  "types": "dist/index.d.ts",
+  "repository": "git@github.com:toitware/esptool.js.git",
+  "author": "Toitware ApS",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "clean": "tsc -b tsconfig.json --clean",
+    "lint": "eslint 'src/*.{js,ts,tsx}' --max-warnings=0",
+    "doc": "typedoc",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "files": [
+    "build",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.28.0",
+    "@typescript-eslint/parser": "^4.28.0",
+    "eslint": "^7.29.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "gh-pages": "^3.2.3",
+    "prettier": "^2.3.1",
+    "typedoc": "^0.21.0",
+    "typescript": "^4.3.4"
+  }
+}

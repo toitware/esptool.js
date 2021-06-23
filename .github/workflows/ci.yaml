@@ -1,0 +1,20 @@
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    name: ci
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: install node v14
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14
+    - name: install
+      run: yarn install
+    - name: eslint
+      run: yarn lint
+    - name: build
+      run: yarn build

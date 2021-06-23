@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "composite": false,
+    "outDir": "./build",
+    "rootDir": "./src",
+    "strict": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "jsx": "preserve",
+    "lib": ["dom", "dom.iterable", "es2017"],
+    "typeRoots": [
+      "src/@types",
+    ],
+  },
+  "preset": "ts-jest",
+  "include": [
+    "src",
+  ]
+}
