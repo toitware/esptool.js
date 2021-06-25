@@ -1,6 +1,6 @@
 {
   "name": "@toit/esptool.js",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "TypeScript port of the esptool",
   "main": "build/index.js",
   "types": "dist/index.d.ts",
@@ -19,7 +19,15 @@
     "build",
     "README.md"
   ],
-  "keywords": ["esptool", "webserial", "esp32", "esp8266", "serial", "toit", "toitware"],
+  "keywords": [
+    "esptool",
+    "webserial",
+    "esp32",
+    "esp8266",
+    "serial",
+    "toit",
+    "toitware"
+  ],
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.28.0",
     "@typescript-eslint/parser": "^4.28.0",

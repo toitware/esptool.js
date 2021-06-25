@@ -23,13 +23,12 @@ jobs:
 
     - name: Update version in package.json (Release only)
       if: github.event_name == 'release'
-      working-directory: ./node
       run: yarn version --new-version $(echo ${{ github.event.release.tag_name }} | sed -e "s/v//gI") --no-git-tag-version
 
     - name: build
       run: yarn build
 
-    - name: Publish typedoc
+    - name: Publish typedoc (Release only)
       if: github.event_name == 'release'
       run: |
         yarn run doc
