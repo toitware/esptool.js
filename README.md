@@ -1,4 +1,11 @@
 # esptool.js
+
+[![npm](https://img.shields.io/npm/v/@toit/esptool.js.svg?style=flat-square)](https://www.npmjs.org/package/@toit/esptool.js)
+[![npm](https://img.shields.io/npm/l/@toit/esptool.js.svg?style=flat-square)](https://www.npmjs.org/package/@toit/esptool.js)
+[![typedoc](https://img.shields.io/badge/-typedoc-blue?style=flat-square)](https://toitware.github.io/esptool.js)
+[![GitHub](https://img.shields.io/github/stars/toitware/esptool.js.svg?style=flat-square)](https://github.com/toitware/esptool.js)
+
+
 TypeScript port of the esptool.
 
 The [esptool](https://github.com/espressif/esptool) is originally written in python, and we have here ported it to TypeScript.
