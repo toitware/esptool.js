@@ -12,7 +12,6 @@
     "clean": "tsc -b tsconfig.json --clean",
     "lint": "eslint 'src/*.{js,ts,tsx}' --max-warnings=0",
     "doc": "typedoc",
-    "doc:publish": "gh-pages -m '[CI] update doc' -d build/docs/",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "files": [

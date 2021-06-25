@@ -28,13 +28,16 @@ jobs:
     - name: build
       run: yarn build
 
+    - name: build typedoc (Release only)
+      if: github.event_name == 'release'
+      run: yarn run doc
+
     - name: Publish typedoc (Release only)
       if: github.event_name == 'release'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        yarn run doc
-        yarn run doc:publish
+      uses: JamesIves/github-pages-deploy-action@4.1.4
+      with:
+        branch: gh-pages
+        folder: build/docs/
 
     - name: Publish to npmjs.org (Release only)
       if: github.event_name == 'release'
