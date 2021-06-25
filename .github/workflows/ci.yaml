@@ -30,6 +30,8 @@ jobs:
 
     - name: Publish typedoc (Release only)
       if: github.event_name == 'release'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         yarn run doc
         yarn run doc:publish
