@@ -3,7 +3,7 @@
   "version": "0.9.1",
   "description": "TypeScript port of the esptool",
   "main": "build/index.js",
-  "types": "dist/index.d.ts",
+  "types": "build/index.d.ts",
   "repository": "git@github.com:toitware/esptool.js.git",
   "author": "Toitware ApS",
   "license": "MIT",
