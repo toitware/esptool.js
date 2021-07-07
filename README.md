@@ -14,6 +14,8 @@ This implementation is used in the [Toit Console](https://console.toit.io) to al
 
 [![Flash ESP32 with web serial](https://img.youtube.com/vi/ZsD59Tg2oCQ/0.jpg)](https://www.youtube.com/watch?v=ZsD59Tg2oCQ)
 
+Blog post on why we started this project: [Flash your ESP32 from the browser using Web Serial](https://blog.toit.io/flash-your-esp32-from-the-browser-using-web-serial-5eccb1483b9c).
+
 ## Example
 
 The code is written as a library, here is an examples showcasing how you can flash an ESP32 using the library:
