@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "module": "CommonJS",
     "target": "es2017",
     "composite": false,
     "outDir": "./build",
