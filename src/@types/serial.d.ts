@@ -29,7 +29,7 @@ export declare global {
     getInfo(): SerialPortInfo;
 
     open(options: SerialOptions): Promise<undefined>;
-    setSignals(signals: SerialOutputSignals): void;
+    setSignals(signals: SerialOutputSignals): Promise<void>;
     getSignals(): Promise<SerialInputSignals>;
     close(): Promise<undefined>;
   }
