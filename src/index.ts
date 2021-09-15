@@ -117,18 +117,20 @@ export class EspLoader {
   }
 
   /**
-   * @param rebootWaitMs how long it may take to reboot
    * Start the read loop up.
    */
-  async connect(rebootWaitMs = 1000): Promise<void> {
+  async connect(): Promise<void> {
     if (this.readLoopPromise) {
       throw "already open";
     }
 
-    this.serialPort.setSignals({ dataTerminalReady: false, requestToSend: true });
-    this.serialPort.setSignals({ dataTerminalReady: true, requestToSend: false });
-    await new Promise((resolve) => setTimeout(resolve, rebootWaitMs));
-
+    await this.serialPort.setSignals({ dataTerminalReady: false });
+    await this.serialPort.setSignals({ requestToSend: true });
+    await sleep(100);
+    await this.serialPort.setSignals({ dataTerminalReady: true });
+    await this.serialPort.setSignals({ requestToSend: false });
+    await sleep(50);
+    await this.serialPort.setSignals({ dataTerminalReady: false });
     this._connect();
   }
 
