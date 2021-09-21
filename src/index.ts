@@ -2,8 +2,8 @@
 // Use of this source code is governed by an MIT-style license that can be
 // found in the LICENSE file.
 
-import { sleep, Uint8Buffer, Uint8BufferSlipEncode, toByteArray, toHex } from "./util";
 import { ESP32, Stub } from "./stubs";
+import { sleep, toByteArray, toHex, Uint8Buffer, Uint8BufferSlipEncode } from "./util";
 
 export enum ChipFamily {
   ESP32 = "esp32",
@@ -119,18 +119,13 @@ export class EspLoader {
   /**
    * Start the read loop up.
    */
-  async connect(): Promise<void> {
+  async connect(rebootWaitMs = 1000): Promise<void> {
     if (this.readLoopPromise) {
       throw "already open";
     }
-
-    await this.serialPort.setSignals({ dataTerminalReady: false });
-    await this.serialPort.setSignals({ requestToSend: true });
-    await sleep(100);
-    await this.serialPort.setSignals({ dataTerminalReady: true });
-    await this.serialPort.setSignals({ requestToSend: false });
-    await sleep(50);
-    await this.serialPort.setSignals({ dataTerminalReady: false });
+    await this.serialPort.setSignals({ dataTerminalReady: false, requestToSend: true });
+    await this.serialPort.setSignals({ dataTerminalReady: true, requestToSend: false });
+    await new Promise((resolve) => setTimeout(resolve, rebootWaitMs));
     this._connect();
   }
 
