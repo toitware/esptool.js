@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import { ESP32, Stub } from "./stubs";
-import { sleep, toByteArray, toHex, Uint8Buffer, Uint8BufferSlipEncode } from "./util";
+import { isTransientError, sleep, toByteArray, toHex, Uint8Buffer, Uint8BufferSlipEncode } from "./util";
 
 export enum ChipFamily {
   ESP32 = "esp32",
@@ -458,6 +458,26 @@ export class EspLoader {
 
   private async readLoop() {
     this.inputBuffer.reset();
+    try {
+      while (!this.closed) {
+        try {
+          await this.readLoopInner();
+        } catch (e) {
+          const rethrow = !isTransientError(e);
+          if (this.options.debug) {
+            this.logger.debug("readLoop error", e, "rethrow?", rethrow);
+          }
+          if (rethrow) {
+            throw e;
+          }
+        }
+      }
+    } finally {
+      this.closed = true;
+    }
+  }
+
+  private async readLoopInner() {
     this.serialReader = this.serialPort.readable.getReader();
     try {
       while (!this.closed) {
@@ -511,7 +531,7 @@ export class EspLoader {
    * ESP ROM bootloader, we will retry a few times
    */
   async sync(): Promise<void> {
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 10; i++) {
       const response = await this._sync();
       if (response) {
         await sleep(100);
