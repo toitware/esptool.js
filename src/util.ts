@@ -180,7 +180,6 @@ export function isTransientError(e: unknown): boolean {
       e.name === "FramingError" ||
       e.name === "ParityError"
     );
-  } else {
-    return false;
   }
+  return false;
 }
