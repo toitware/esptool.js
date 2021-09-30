@@ -458,22 +458,22 @@ export class EspLoader {
 
   private async readLoop() {
     this.inputBuffer.reset();
-      try {
-        while (!this.closed) {
-            try {
-                await this.readLoopInner();
-            } catch(e) {
-                const rethrow = !isTransientError(e);
-                if (this.options.debug) {
-                  this.logger.debug("readLoop error", e, "rethrow?", rethrow);
-                }
-                if (rethrow) {
-                    throw e;
-                }
-            }
+    try {
+      while (!this.closed) {
+        try {
+          await this.readLoopInner();
+        } catch (e) {
+          const rethrow = !isTransientError(e);
+          if (this.options.debug) {
+            this.logger.debug("readLoop error", e, "rethrow?", rethrow);
+          }
+          if (rethrow) {
+            throw e;
+          }
         }
+      }
     } finally {
-        this.closed = true;
+      this.closed = true;
     }
   }
 

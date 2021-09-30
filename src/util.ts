@@ -172,10 +172,15 @@ export function toHex(value: number, size = 2): string {
   return "0x" + value.toString(16).toUpperCase().padStart(size, "0");
 }
 
-export function isTransientError(e: any): boolean {
+export function isTransientError(e: unknown): boolean {
   if (e instanceof DOMException) {
-      return e.name === "BufferOverrunError" || e.name === "BreakError" || e.name === "FramingError" || e.name === "ParityError"
+    return (
+      e.name === "BufferOverrunError" ||
+      e.name === "BreakError" ||
+      e.name === "FramingError" ||
+      e.name === "ParityError"
+    );
   } else {
-      return false
+    return false;
   }
 }
