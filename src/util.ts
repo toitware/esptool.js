@@ -34,7 +34,7 @@ export class Uint8Buffer {
   private grow(newSize: number) {
     const newBuffer = new ArrayBuffer(newSize);
     const newView = new Uint8Array(newBuffer);
-    this._view.forEach((v, i) => (newView[i] = v));
+    newView.set(this._view, 0);
     this.size = newSize;
     this._buffer = newBuffer;
     this._view = newView;
@@ -107,6 +107,32 @@ export class Uint8Buffer {
     this.writeOffset += bytes.length;
   }
 
+  /**
+   * @name packet
+   * returns the bytes between two 0xc0 bytes.
+   */
+  packet(): Uint8Array {
+    let dataStart: number | undefined;
+    let dataEnd: number | undefined;
+    console.log("view", this.length)
+    for (let i = this.readOffset; i < this.writeOffset; i++) {
+      console.log(this._view[i]);
+      if (this._view[i] === 0xc0) {
+        if (dataStart === undefined) {
+          dataStart = i + 1;
+        } else {
+          dataEnd = i - 1;
+          break;
+        }
+      }
+    }
+    console.log("start", dataStart, "end", dataEnd);
+    if (dataEnd === undefined || dataStart === undefined) {
+      return new Uint8Array(0);
+    }
+    return new Uint8Array(this._buffer, dataStart, dataEnd);
+  }
+
   view(): Uint8Array {
     return new Uint8Array(this._buffer, this.readOffset, this.writeOffset);
   }
@@ -142,6 +168,33 @@ export class Uint8BufferSlipEncode extends Uint8Buffer {
     } else {
       bytes.forEach((v) => this.slipEncodeByte(v));
     }
+  }
+
+  /**
+   * @name packet
+   * returns the bytes between two 0xc0 bytes.
+   * decodes slip encoding
+   */
+   packet(slipDecode:boolean = false): Uint8Array {
+    const res = super.packet();
+    if (!slipDecode) {
+      return res;
+    }
+    console.log("raw read", res);
+    let writeOffset = 0;
+    for (let i = 0; i < res.byteLength; i++) {
+      if (res[i] == 0xdb && i+1 < res.byteLength && res[i+1] == 0xdd) {
+        res[writeOffset++] = 0xdb;
+        i++;
+      } else if (res[i] == 0xdb && i+1 < res.byteLength && res[i+1] == 0xdc) {
+        res[writeOffset++] = 0xc0;
+        i++;
+      } else {
+        res[writeOffset++] = res[i];
+      }
+    }
+    res.slice(0, writeOffset);
+    return res;
   }
 
   /**
