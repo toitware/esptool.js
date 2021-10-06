@@ -112,11 +112,10 @@ export class Uint8Buffer {
    * returns the bytes between two 0xc0 bytes.
    */
   packet(): Uint8Array {
-    let dataStart: number | undefined;
+    console.log("raw read", this.view());
+    let dataStart: number | undefined;
     let dataEnd: number | undefined;
-    console.log("view", this.length)
     for (let i = this.readOffset; i < this.writeOffset; i++) {
-      console.log(this._view[i]);
       if (this._view[i] === 0xc0) {
         if (dataStart === undefined) {
           dataStart = i + 1;
@@ -126,8 +125,7 @@ export class Uint8Buffer {
         }
       }
     }
-    console.log("start", dataStart, "end", dataEnd);
-    if (dataEnd === undefined || dataStart === undefined) {
+    if (dataEnd === undefined || dataStart === undefined) {
       return new Uint8Array(0);
     }
     return new Uint8Array(this._buffer, dataStart, dataEnd);
@@ -175,18 +173,17 @@ export class Uint8BufferSlipEncode extends Uint8Buffer {
    * returns the bytes between two 0xc0 bytes.
    * decodes slip encoding
    */
-   packet(slipDecode:boolean = false): Uint8Array {
+  packet(slipDecode = false): Uint8Array {
     const res = super.packet();
     if (!slipDecode) {
       return res;
     }
-    console.log("raw read", res);
     let writeOffset = 0;
     for (let i = 0; i < res.byteLength; i++) {
-      if (res[i] == 0xdb && i+1 < res.byteLength && res[i+1] == 0xdd) {
+      if (res[i] == 0xdb && i + 1 < res.byteLength && res[i + 1] == 0xdd) {
         res[writeOffset++] = 0xdb;
         i++;
-      } else if (res[i] == 0xdb && i+1 < res.byteLength && res[i+1] == 0xdc) {
+      } else if (res[i] == 0xdb && i + 1 < res.byteLength && res[i + 1] == 0xdc) {
         res[writeOffset++] = 0xc0;
         i++;
       } else {
