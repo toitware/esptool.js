@@ -79,6 +79,7 @@ interface commandResult {
 type progressCallback = (i: number, total: number) => void;
 
 const UnknownChipFamilyError = "Unknown chip family";
+const DoneError = "done";
 const TimeoutError = "timeout";
 const ConnectError = "connect error";
 
@@ -93,7 +94,7 @@ export class EspLoader {
 
   // readLoop state
   // private closed = true;
-  private readPromise: Promise<Uint8Array> | undefined = undefined;
+  // private readPromise: Promise<Uint8Array> | undefined = undefined;
   private serialReader: ReadableStreamDefaultReader<Uint8Array> | undefined = undefined;
   // private inputBuffer: Uint8Buffer = new Uint8Buffer(64);
 
@@ -140,7 +141,7 @@ export class EspLoader {
     }
 
     try {
-      await this.read2(false, 200);
+      await this.read(false, 200);
     } catch (e) {}
   }
 
@@ -152,13 +153,13 @@ export class EspLoader {
     await this.serialPort.setSignals({ requestToSend: false });
     await sleep(50);
     await this.serialPort.setSignals({ dataTerminalReady: false });
-    let i = 0;
-    while (true) {
+    let i = 20;
+    while (i--) {
       i++;
       try {
-        const p = await this.read2(false, 1000);
-        const txt = new TextDecoder().decode(p);
-        console.log("read junk", txt);
+        const p = await this.read(false, 1000);
+        // const txt = new TextDecoder().decode(p);
+        console.log("read junk", p?.length);
       } catch (e) {
         if (e === TimeoutError) {
           break;
@@ -194,14 +195,14 @@ export class EspLoader {
    * shutdown the read loop.
    */
   async disconnect(): Promise<void> {
-    const p = this.readPromise;
+    // const p = this.readPromise;
     const reader = this.serialReader;
     if (reader) {
       await reader.cancel();
     }
-    if (p) {
-      await p;
-    }
+    // if (p) {
+    //   await p;
+    // }
     return;
   }
 
@@ -445,7 +446,7 @@ export class EspLoader {
     //   }
     //   if (reply.length > 4) {
     //     // get the length
-    //     packetLength = reply[3] + (reply[4] << 8);
+    //     packetLength = reply[3] +  (reply[4] << 8);
     //   }
     //   if (reply.length == packetLength + 10) {
     //     break;
@@ -454,7 +455,7 @@ export class EspLoader {
 
     try {
       console.log("trying to read", timeout);
-      const reply = await this.read2(true, timeout);
+      const reply = await this.read(true, timeout);
       if (this.options.debug) {
         this.logger.debug("Reading", reply.length, "byte" + (reply.length == 1 ? "" : "s") + ":", reply);
       }
@@ -879,32 +880,53 @@ export class EspLoader {
     if (this.serialReader !== undefined) {
       throw "Read already in progress";
     }
-    const reader = this.serialPort.readable.getReader();
-    this.serialReader = reader;
-    const read = new Promise<Uint8Array>((resolve, reject) => {
-      const timeout = setTimeout(async () => {
-        console.log("timeout executed");
+    let reader = this.serialPort.readable.getReader();
+    let timeout = false;
+    const chTimeout = setTimeout(async () => {
+      try {
+        console.log("timed out")
+        timeout = true;
         await reader.cancel();
-      }, timeoutMs);
-      const clear = async () => {
-        clearTimeout(timeout);
-        this.serialReader = undefined;
-        this.readPromise = undefined;
+      } catch(e) {
+        // Ignore cancel errors.
+      }
+    }, timeoutMs);
+
+    const clear = async () => {
+      clearTimeout(chTimeout);
+      try {
         await reader.cancel();
-        reader.releaseLock();
-      };
-      this._read(reader, packetMode, minRead)
-        .then(async (res) => {
-          await clear();
-          resolve(res);
-        })
-        .catch(async (e) => {
-          await clear();
-          reject(e);
-        });
-    });
-    this.readPromise = read;
-    return await read;
+      } catch(e) {
+        // ignore cancel errors.
+      }
+      reader.releaseLock();
+    };
+    try {
+      while (true) {
+        if (timeout) {
+          throw TimeoutError;
+        }
+
+        console.log("doing _read")
+        try {
+          return await this._read(reader, packetMode, minRead);
+        } catch(e) {
+          if (isTransientError(e)) {
+            continue;
+          }
+          if (DoneError) {
+            reader.releaseLock()
+            reader = this.serialPort.readable.getReader();
+            await sleep(1);
+            console.log("reload reader", timeout)
+            continue;
+          }
+          throw e;
+        }
+      }
+    } finally {
+      await clear();
+    }
   }
 
   private readBuffer = new Uint8BufferSlipEncode();
@@ -913,55 +935,28 @@ export class EspLoader {
     packetMode = true,
     minRead = 12
   ): Promise<Uint8Array> {
+
     this.readBuffer.reset();
-    while (this.readBuffer.length < minRead) {
-      const { value, done } = await reader.read();
-      if (done) {
-        throw TimeoutError;
+    while (true) {
+      while (this.readBuffer.length < minRead) {
+        const { value, done } = await reader.read();
+        if (done) {
+          console.log("throw done error")
+          throw DoneError;
+        }
+        if (value) {
+          this.readBuffer.copy(value);
+        }
       }
-      if (value) {
-        this.readBuffer.copy(value);
+      if (packetMode) {
+        const res = this.readBuffer.packet(true);
+        if (res !== undefined) {
+          return res;
+        }
+      } else {
+        return this.readBuffer.view();
       }
     }
-    if (packetMode) {
-      return this.readBuffer.packet(true);
-    }
-    return this.readBuffer.view();
-  }
-
-  private async read2(packetMode = true, timeoutMs = 1000, min_data = 12) {
-    this.readBuffer.reset();
-    const reader = this.serialPort.readable.getReader();
-    const t = setTimeout(async function () {
-      await reader.cancel();
-      reader.releaseLock();
-    }, timeoutMs);
-
-    let timeout = false;
-    do {
-      this.serialReader = reader;
-      const { value, done } = await reader.read();
-      this.serialReader = undefined;
-      if (value) {
-        this.readBuffer.copy(value);
-      }
-      if (done) {
-        timeout = true;
-        break;
-      }
-    } while (this.readBuffer.length < min_data);
-
-    clearTimeout(t);
-    await reader.cancel();
-    reader.releaseLock();
-    if (timeout) {
-      throw TimeoutError;
-    }
-
-    if (packetMode) {
-      return this.readBuffer.packet(true);
-    }
-    return this.readBuffer.view();
   }
 
   /**

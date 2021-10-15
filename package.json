@@ -9,6 +9,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc -b tsconfig.json",
+    "watch": "tsc -b tsconfig.json -w",
     "clean": "tsc -b tsconfig.json --clean",
     "lint": "eslint 'src/*.{js,ts,tsx}' --max-warnings=0",
     "doc": "typedoc",
