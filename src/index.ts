@@ -87,7 +87,7 @@ export class EspLoader {
   private serialPort: SerialPort;
   private isStub = false;
 
-  private serialReaderClosed: boolean = false;
+  private serialReaderClosed = false;
   private serialReader: ReadableStreamDefaultReader<Uint8Array> | undefined = undefined;
 
   constructor(serialPort: SerialPort, options?: Partial<EspLoaderOptions>) {
