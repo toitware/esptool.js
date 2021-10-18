@@ -87,6 +87,7 @@ export class EspLoader {
   private serialPort: SerialPort;
   private isStub = false;
 
+  private serialReaderClosed: boolean = false;
   private serialReader: ReadableStreamDefaultReader<Uint8Array> | undefined = undefined;
 
   constructor(serialPort: SerialPort, options?: Partial<EspLoaderOptions>) {
@@ -179,7 +180,9 @@ export class EspLoader {
     const reader = this.serialReader;
     if (reader) {
       try {
+        this.serialReaderClosed = true;
         await reader.cancel();
+        await reader.closed;
       } catch (e) {
         //ignore cancel errors.
       }
@@ -670,12 +673,12 @@ export class EspLoader {
     }
     let reader = this.serialPort.readable.getReader();
     this.serialReader = reader;
+    this.serialReaderClosed = false;
     this.readBuffer.reset();
 
-    let timeout = false;
     const chTimeout = setTimeout(async () => {
       try {
-        timeout = true;
+        this.serialReaderClosed = true;
         await reader.cancel();
       } catch (e) {
         // Ignore cancel errors.
@@ -684,7 +687,7 @@ export class EspLoader {
 
     try {
       while (true) {
-        if (timeout) {
+        if (this.serialReaderClosed) {
           throw TimeoutError;
         }
 
@@ -702,9 +705,7 @@ export class EspLoader {
         }
       }
     } finally {
-      if (!timeout) {
-        clearTimeout(chTimeout);
-      }
+      clearTimeout(chTimeout);
       try {
         await reader.cancel();
       } catch (e) {
@@ -712,6 +713,7 @@ export class EspLoader {
       }
       reader.releaseLock();
       this.serialReader = undefined;
+      this.serialReaderClosed = false;
     }
   }
 
