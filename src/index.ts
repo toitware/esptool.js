@@ -11,8 +11,8 @@ export enum ChipFamily {
   ESP32S2 = "esp32S2",
 }
 
-const FLASH_WRITE_SIZE = 0x200;
-const ESP32S2_FLASH_WRITE_SIZE = 0x400;
+const FLASH_WRITE_SIZE = 0x400;
+const STUB_FLASH_WRITE_SIZE = 0x4000;
 
 // Flash sector size, minimum unit of erase.
 const FLASH_SECTOR_SIZE = 0x1000;
@@ -21,9 +21,6 @@ const UART_DATE_REG_ADDR = 0x60000078;
 export const ESP_ROM_BAUD = 115200;
 
 const SYNC_PACKET = toByteArray("\x07\x07\x12 UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
-const ESP32_DATAREGVALUE = 0x15122500;
-const ESP8266_DATAREGVALUE = 0x00062000;
-const ESP32S2_DATAREGVALUE = 0x500;
 
 const CHIP_DETECT_MAGIC_REG_ADDR = 0x40001000;
 const ESP32_DETECT_MAGIC_VALUE = 0x00f01d83;
@@ -46,8 +43,6 @@ const ESP_SPI_SET_PARAMS = 0x0b;
 const ESP_SPI_ATTACH = 0x0d;
 const ESP_CHANGE_BAUDRATE = 0x0f;
 const ESP_CHECKSUM_MAGIC = 0xef;
-
-const ROM_INVALID_RECV_MSG = 0x05;
 
 const USB_RAM_BLOCK = 0x800;
 
@@ -79,9 +74,10 @@ interface commandResult {
 type progressCallback = (i: number, total: number) => void;
 
 const UnknownChipFamilyError = "Unknown chip family";
-const DoneError = "done";
+const ClosedError = "closed";
 const TimeoutError = "timeout";
 const ConnectError = "connect error";
+const ReadAlreadyInProgressError = "Read already in progress";
 
 export class EspLoader {
   // caches
@@ -92,11 +88,7 @@ export class EspLoader {
   private serialPort: SerialPort;
   private isStub = false;
 
-  // readLoop state
-  // private closed = true;
-  // private readPromise: Promise<Uint8Array> | undefined = undefined;
   private serialReader: ReadableStreamDefaultReader<Uint8Array> | undefined = undefined;
-  // private inputBuffer: Uint8Buffer = new Uint8Buffer(64);
 
   constructor(serialPort: SerialPort, options?: Partial<EspLoaderOptions>) {
     this.options = Object.assign(
@@ -153,13 +145,11 @@ export class EspLoader {
     await this.serialPort.setSignals({ requestToSend: false });
     await sleep(50);
     await this.serialPort.setSignals({ dataTerminalReady: false });
-    let i = 20;
-    while (i--) {
-      i++;
+
+    // Wait until device has stable output.
+    for (let i = 0; i < 20; i++) {
       try {
-        const p = await this.read(false, 1000);
-        // const txt = new TextDecoder().decode(p);
-        console.log("read junk", p?.length);
+        await this.read(false, 1000);
       } catch (e) {
         if (e === TimeoutError) {
           break;
@@ -167,42 +157,34 @@ export class EspLoader {
       }
       await sleep(50);
     }
+
+    // Try sync.
     for (let i = 0; i < 7; i++) {
       try {
-        await this.sync();
-        return true;
-      } catch (e) {
-        console.log("sync try failed", e);
+        if (await this.sync()) {
+          return true;
+        }
+      } catch(e) {
+        this.options.logger.debug("sync error", e);
       }
       await sleep(50);
     }
-    // await this.serialPort.setSignals({ dataTerminalReady: false, requestToSend: true });
-    // await this.serialPort.setSignals({ dataTerminalReady: true, requestToSend: false });
-    // await new Promise((resolve) => setTimeout(resolve, rebootWaitMs));
 
     return false;
   }
-
-  // private _connect() {
-  //   this.closed = false;
-  //   this.readPromise = (async () => {
-  //     await this.readLoop();
-  //     this.readPromise = undefined;
-  //   })();
-  // }
 
   /**
    * shutdown the read loop.
    */
   async disconnect(): Promise<void> {
-    // const p = this.readPromise;
     const reader = this.serialReader;
     if (reader) {
+      try {
       await reader.cancel();
+      } catch(e) {
+        //ignore cancel errors.
+      }
     }
-    // if (p) {
-    //   await p;
-    // }
     return;
   }
 
@@ -264,11 +246,9 @@ export class EspLoader {
       throw UnknownChipFamilyError;
     }
     const efuses = new Uint32Array(4);
-    console.log("read efuses");
     for (let i = 0; i < 4; i++) {
       efuses[i] = await this.readRegister(baseAddr + 4 * i);
     }
-    console.log("efuse", efuses);
     return efuses;
   }
 
@@ -351,45 +331,10 @@ export class EspLoader {
     } else {
       return value;
     }
-    // let statusLen = 0;
-    // if (data !== undefined) {
-    //   const chipFamily = this._chipfamily;
-    //   if (this.isStub) {
-    //     statusLen = 2;
-    //   } else if (chipFamily === ChipFamily.ESP8266) {
-    //     statusLen = 2;
-    //   } else if (chipFamily === ChipFamily.ESP32 || chipFamily === ChipFamily.ESP32S2) {
-    //     statusLen = 4;
-    //   } else {
-    //     if ([2, 4].includes(data.length)) {
-    //       statusLen = data.length;
-    //     }
-    //   }
-    // }
-    // if (value === undefined || data === undefined || data.length < statusLen) {
-    //   throw "Didn't get enough status bytes";
-    // }
-    // const status = data.slice(-statusLen, data.length);
-    // data = data.slice(0, -statusLen);
-    // if (this.options.debug) {
-    //   this.logger.debug("status", status);
-    //   this.logger.debug("value", value);
-    //   this.logger.debug("data", data);
-    // }
-    // if (status[0] == 1) {
-    //   if (status[1] == ROM_INVALID_RECV_MSG) {
-    //     throw "Invalid (unsupported) command " + toHex(opcode);
-    //   } else {
-    //     throw "Command failure error code " + toHex(status[1]);
-    //   }
-    // }
-    // return { value, data };
   }
 
   private _sendCommandBuffer = new Uint8BufferSlipEncode();
   private async sendCommand(opcode: number, buffer: Uint8Array, checksum = 0) {
-    // this.inputBuffer.reset(); // Reset input buffer
-
     const packet = this._sendCommandBuffer;
     packet.reset();
     packet.push(0xc0, 0x00); // direction
@@ -409,58 +354,12 @@ export class EspLoader {
   }
 
   private async getResponse(opcode: number, timeout: number = DEFAULT_TIMEOUT): Promise<commandResult> {
-    // let reply: number[] = [];
-    // let packetLength = 0;
-    // let escapedByte = false;
-    // const stamp = Date.now();
-    // while (Date.now() - stamp < timeout) {
-    //   // let c = await this.inputBuffer.awaitShift(timeout)
-    //   if (this.inputBuffer.length > 0) {
-    //     const c = this.inputBuffer.shift() || 0;
-    //     if (c == 0xdb) {
-    //       escapedByte = true;
-    //     } else if (escapedByte) {
-    //       if (c == 0xdd) {
-    //         reply.push(0xdc);
-    //       } else if (c == 0xdc) {
-    //         reply.push(0xc0);
-    //       } else {
-    //         reply = reply.concat([0xdb, c]);
-    //       }
-    //       escapedByte = false;
-    //     } else {
-    //       reply.push(c);
-    //     }
-    //   } else {
-    //     await sleep(10);
-    //   }
-    //   if (reply.length > 0 && reply[0] != 0xc0) {
-    //     // packets must start with 0xC0
-    //     reply.shift();
-    //   }
-    //   if (reply.length > 1 && reply[1] != 0x01) {
-    //     reply.shift();
-    //   }
-    //   if (reply.length > 2 && reply[2] != opcode) {
-    //     reply.shift();
-    //   }
-    //   if (reply.length > 4) {
-    //     // get the length
-    //     packetLength = reply[3] +  (reply[4] << 8);
-    //   }
-    //   if (reply.length == packetLength + 10) {
-    //     break;
-    //   }
-    // }
-
     try {
-      console.log("trying to read", timeout);
       const reply = await this.read(true, timeout);
       if (this.options.debug) {
         this.logger.debug("Reading", reply.length, "byte" + (reply.length == 1 ? "" : "s") + ":", reply);
       }
       const opcode_ret = reply[1];
-      console.log("Opcode", opcode, "response", opcode_ret, "reply", reply);
       if (opcode !== opcode_ret) {
         throw "invalid opcode response";
       }
@@ -472,113 +371,9 @@ export class EspLoader {
       }
       return { value, data };
     } catch (e) {
-      console.log("received", e);
       throw e;
     }
-
-    // // Check to see if we have a complete packet. If not, we timed out.
-    // if (reply.length != packetLength + 10) {
-    //   this.logger.debug("Timed out after", timeout, "milliseconds");
-    //   return { value: undefined, data: undefined };
-    // }
-    // if (this.options.debug) {
-    //   this.logger.debug("Reading", reply.length, "byte" + (reply.length == 1 ? "" : "s") + ":", reply);
-    // }
-    // const value = reply.slice(5, 9);
-    // const data = reply.slice(9, -1);
-    // if (this.options.debug) {
-    //   this.logger.debug("value:", value, "data:", data);
-    // }
-    // return { value, data };
   }
-
-  // private async readBuffer(timeout: number = DEFAULT_TIMEOUT): Promise<Uint8Array | null> {
-  //   let reply: number[] = [];
-  //   let escapedByte = false;
-  //   const stamp = Date.now();
-  //   while (Date.now() - stamp < timeout) {
-  //     if (this.inputBuffer.length > 0) {
-  //       const c = this.inputBuffer.shift() || 0;
-  //       if (c == 0xdb) {
-  //         escapedByte = true;
-  //       } else if (escapedByte) {
-  //         if (c == 0xdd) {
-  //           reply.push(0xdc);
-  //         } else if (c == 0xdc) {
-  //           reply.push(0xc0);
-  //         } else {
-  //           reply = reply.concat([0xdb, c]);
-  //         }
-  //         escapedByte = false;
-  //       } else {
-  //         reply.push(c);
-  //       }
-  //     } else {
-  //       await sleep(10);
-  //     }
-  //     if (reply.length > 0 && reply[0] != 0xc0) {
-  //       // packets must start with 0xC0
-  //       reply.shift();
-  //     }
-  //     if (reply.length > 1 && reply[reply.length - 1] == 0xc0) {
-  //       break;
-  //     }
-  //   }
-  //   // Check to see if we have a complete packet. If not, we timed out.
-  //   if (reply.length < 2) {
-  //     this.logger.log("Timed out after", timeout, "milliseconds");
-  //     return null;
-  //   }
-  //   if (this.options.debug) {
-  //     this.logger.debug("Reading", reply.length, "byte" + (reply.length == 1 ? "" : "s") + ":", reply);
-  //   }
-  //   const data = reply.slice(1, -1);
-  //   if (this.options.debug) {
-  //     this.logger.debug("data:", data);
-  //   }
-  //   return Uint8Array.from(data);
-  // }
-
-  // private async readLoop() {
-  //   this.inputBuffer.reset();
-  //   try {
-  //     while (!this.closed) {
-  //       try {
-  //         await this.readLoopInner();
-  //       } catch (e) {
-  //         const rethrow = !isTransientError(e);
-  //         if (this.options.debug) {
-  //           this.logger.debug("readLoop error", e, "rethrow?", rethrow);
-  //         }
-  //         if (rethrow) {
-  //           throw e;
-  //         }
-  //       }
-  //     }
-  //   } finally {
-  //     this.closed = true;
-  //   }
-  // }
-
-  // private async readLoopInner() {
-  //   this.serialReader = this.serialPort.readable.getReader();
-  //   try {
-  //     while (!this.closed) {
-  //       const { value, done } = await this.serialReader.read();
-  //       if (done) {
-  //         break;
-  //       }
-  //       if (value) {
-  //         this.inputBuffer.copy(value);
-  //       }
-  //     }
-  //   } finally {
-  //     await this.serialReader.cancel();
-  //     this.serialReader.releaseLock();
-  //     this.serialReader = undefined;
-  //     this.closed = true;
-  //   }
-  // }
 
   private static checksum(data: Uint8Array, state: number = ESP_CHECKSUM_MAGIC): number {
     for (const b of data) {
@@ -606,7 +401,6 @@ export class EspLoader {
     try {
       await this.read(false, 500);
     } catch (e) {}
-    // this._connect();
 
     // Baud rate was changed
     this.logger.log("Changed baud rate to", baud);
@@ -616,24 +410,18 @@ export class EspLoader {
    * Put into ROM bootload mode & attempt to synchronize with the
    * ESP ROM bootloader, we will retry a few times
    */
-  private async sync(): Promise<void> {
+  private async sync(): Promise<boolean> {
     await this.sendCommand(ESP_SYNC, SYNC_PACKET);
     const { data } = await this.getResponse(ESP_SYNC, SYNC_TIMEOUT);
     if (data.length > 1 && data[0] == 0 && data[1] == 0) {
-      return;
+      return true;
     }
-    throw "sync error";
-    // try {
-
-    // } catch (e) {
-    //   console.log("sync error", e);
-    // }
+    return false;
   }
 
   private async getFlashWriteSize(): Promise<number> {
-    const chipFamily = this.isStub ? null : await this.chipFamily();
-    if (chipFamily === ChipFamily.ESP32S2) {
-      return ESP32S2_FLASH_WRITE_SIZE;
+    if (this.isStub) {
+      return STUB_FLASH_WRITE_SIZE;
     }
     return FLASH_WRITE_SIZE;
   }
@@ -735,7 +523,7 @@ export class EspLoader {
       numBlocks,
       " block size ",
       flashWriteSize,
-      " offset " + toHex(offset, 4) + ", encrypted " + (encrypted ? "yes" : "no")
+      " offset " + toHex(offset, 4) // + ", encrypted " + (encrypted ? "yes" : "no")
     );
     await this.checkCommand(ESP_FLASH_BEGIN, buffer.view(), 0, timeout);
     if (size != 0 && !this.isStub) {
@@ -876,15 +664,18 @@ export class EspLoader {
     this._efuses = undefined;
   }
 
+  private readBuffer = new Uint8BufferSlipEncode();
   private async read(packetMode = true, timeoutMs = 1000, minRead = 12): Promise<Uint8Array> {
     if (this.serialReader !== undefined) {
-      throw "Read already in progress";
+      throw ReadAlreadyInProgressError;
     }
     let reader = this.serialPort.readable.getReader();
+    this.serialReader = reader;
+    this.readBuffer.reset();
+
     let timeout = false;
     const chTimeout = setTimeout(async () => {
       try {
-        console.log("timed out")
         timeout = true;
         await reader.cancel();
       } catch(e) {
@@ -892,62 +683,54 @@ export class EspLoader {
       }
     }, timeoutMs);
 
-    const clear = async () => {
-      clearTimeout(chTimeout);
-      try {
-        await reader.cancel();
-      } catch(e) {
-        // ignore cancel errors.
-      }
-      reader.releaseLock();
-    };
     try {
       while (true) {
         if (timeout) {
           throw TimeoutError;
         }
 
-        console.log("doing _read")
         try {
           return await this._read(reader, packetMode, minRead);
         } catch(e) {
-          if (isTransientError(e)) {
-            continue;
-          }
-          if (DoneError) {
+          if (e === ClosedError) {
             reader.releaseLock()
-            reader = this.serialPort.readable.getReader();
             await sleep(1);
-            console.log("reload reader", timeout)
-            continue;
+            reader = this.serialPort.readable.getReader();
+            this.serialReader = reader;
+          } else if (!isTransientError(e)) {
+            throw e;
           }
-          throw e;
         }
       }
     } finally {
-      await clear();
+      if (!timeout) {
+        clearTimeout(chTimeout);
+      }
+      try {
+        await reader.cancel();
+      } catch(e) {
+        // ignore cancel errors.
+      }
+      reader.releaseLock();
+      this.serialReader = undefined;
     }
   }
 
-  private readBuffer = new Uint8BufferSlipEncode();
   private async _read(
     reader: ReadableStreamDefaultReader<Uint8Array>,
     packetMode = true,
     minRead = 12
   ): Promise<Uint8Array> {
-
-    this.readBuffer.reset();
     while (true) {
-      while (this.readBuffer.length < minRead) {
+      do {
         const { value, done } = await reader.read();
-        if (done) {
-          console.log("throw done error")
-          throw DoneError;
-        }
         if (value) {
           this.readBuffer.copy(value);
         }
-      }
+        if (done) {
+          throw ClosedError;
+        }
+      } while (this.readBuffer.length < minRead);
       if (packetMode) {
         const res = this.readBuffer.packet(true);
         if (res !== undefined) {

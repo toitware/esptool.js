@@ -127,16 +127,12 @@ export class Uint8Buffer {
     if (dataEnd === undefined || dataStart === undefined) {
       return undefined;
     }
-    this.readOffset = dataEnd;
+    this.readOffset = dataEnd + 1;
     return new Uint8Array(this._buffer, dataStart, dataEnd);
   }
 
-  view(reset:boolean = true): Uint8Array {
-    const res = new Uint8Array(this._buffer, this.readOffset, this.writeOffset);
-    if (reset) {
-      this.reset();
-    }
-    return res;
+  view(): Uint8Array {
+    return new Uint8Array(this._buffer, this.readOffset, this.writeOffset);
   }
 }
 
