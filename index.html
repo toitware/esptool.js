@@ -89,9 +89,7 @@
 <span style="color: #000000">  </span><span style="color: #001080">options</span><span style="color: #000000">.</span><span style="color: #001080">logger</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;connecting...&quot;</span><span style="color: #000000">);</span>
 <span style="color: #000000">  </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">loader</span><span style="color: #000000">.</span><span style="color: #795E26">connect</span><span style="color: #000000">();</span>
 <span style="color: #000000">  </span><span style="color: #AF00DB">try</span><span style="color: #000000"> {</span>
-<span style="color: #000000">    </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">loader</span><span style="color: #000000">.</span><span style="color: #795E26">sync</span><span style="color: #000000">();</span>
 <span style="color: #000000">    </span><span style="color: #001080">options</span><span style="color: #000000">.</span><span style="color: #001080">logger</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;connected&quot;</span><span style="color: #000000">);</span>
-
 <span style="color: #000000">    </span><span style="color: #001080">options</span><span style="color: #000000">.</span><span style="color: #001080">logger</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;writing device partitions&quot;</span><span style="color: #000000">);</span>
 <span style="color: #000000">    </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">chipName</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">loader</span><span style="color: #000000">.</span><span style="color: #795E26">chipName</span><span style="color: #000000">();</span>
 <span style="color: #000000">    </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">macAddr</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">loader</span><span style="color: #000000">.</span><span style="color: #795E26">macAddr</span><span style="color: #000000">();</span>
@@ -148,9 +146,6 @@
 				<ul>
 					<li class=" ">
 						<a href="modules.html">Modules</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_types_serial.html">@types/serial</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="modules/index.html">index</a>
