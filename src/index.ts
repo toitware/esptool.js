@@ -16,7 +16,6 @@ const STUB_FLASH_WRITE_SIZE = 0x4000;
 
 // Flash sector size, minimum unit of erase.
 const FLASH_SECTOR_SIZE = 0x1000;
-const UART_DATE_REG_ADDR = 0x60000078;
 
 export const ESP_ROM_BAUD = 115200;
 
@@ -164,7 +163,7 @@ export class EspLoader {
         if (await this.sync()) {
           return true;
         }
-      } catch(e) {
+      } catch (e) {
         this.options.logger.debug("sync error", e);
       }
       await sleep(50);
@@ -180,8 +179,8 @@ export class EspLoader {
     const reader = this.serialReader;
     if (reader) {
       try {
-      await reader.cancel();
-      } catch(e) {
+        await reader.cancel();
+      } catch (e) {
         //ignore cancel errors.
       }
     }
@@ -419,7 +418,7 @@ export class EspLoader {
     return false;
   }
 
-  private async getFlashWriteSize(): Promise<number> {
+  private getFlashWriteSize(): number {
     if (this.isStub) {
       return STUB_FLASH_WRITE_SIZE;
     }
@@ -443,7 +442,7 @@ export class EspLoader {
     const address = offset;
     let position = 0;
     const stamp = Date.now();
-    const flashWriteSize = await this.getFlashWriteSize();
+    const flashWriteSize = this.getFlashWriteSize();
     let block: Uint8Array;
 
     while (filesize - position > 0) {
@@ -487,7 +486,7 @@ export class EspLoader {
     let eraseSize;
     const buffer = new Uint8Buffer(32);
     const chipFamily = this.isStub ? null : await this.chipFamily();
-    const flashWriteSize = await this.getFlashWriteSize();
+    const flashWriteSize = this.getFlashWriteSize();
     if (chipFamily === ChipFamily.ESP32 || chipFamily === ChipFamily.ESP32S2) {
       await this.checkCommand(ESP_SPI_ATTACH, new Uint8Array(8).fill(0));
     }
@@ -678,7 +677,7 @@ export class EspLoader {
       try {
         timeout = true;
         await reader.cancel();
-      } catch(e) {
+      } catch (e) {
         // Ignore cancel errors.
       }
     }, timeoutMs);
@@ -691,9 +690,9 @@ export class EspLoader {
 
         try {
           return await this._read(reader, packetMode, minRead);
-        } catch(e) {
+        } catch (e) {
           if (e === ClosedError) {
-            reader.releaseLock()
+            reader.releaseLock();
             await sleep(1);
             reader = this.serialPort.readable.getReader();
             this.serialReader = reader;
@@ -708,7 +707,7 @@ export class EspLoader {
       }
       try {
         await reader.cancel();
-      } catch(e) {
+      } catch (e) {
         // ignore cancel errors.
       }
       reader.releaseLock();
