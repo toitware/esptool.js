@@ -36,9 +36,7 @@ try {
   options.logger.log("connecting...");
   await loader.connect();
   try {
-    await loader.sync();
     options.logger.log("connected");
-
     options.logger.log("writing device partitions");
     const chipName = await loader.chipName();
     const macAddr = await loader.macAddr();
