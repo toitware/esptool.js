@@ -26,6 +26,9 @@ const ESP32_DETECT_MAGIC_VALUE = 0x00f01d83;
 const ESP8266_DETECT_MAGIC_VALUE = 0xfff0c101;
 const ESP32S2_DETECT_MAGIC_VALUE = 0x000007c6;
 
+const UART_CLKDIV_REG = 0x3ff40014;
+const UART_CLKDIV_MASK = 0xfffff;
+
 // Commands supported by ESP8266 ROM bootloader
 const ESP_FLASH_BEGIN = 0x02;
 const ESP_FLASH_DATA = 0x03;
@@ -43,7 +46,7 @@ const ESP_SPI_ATTACH = 0x0d;
 const ESP_CHANGE_BAUDRATE = 0x0f;
 const ESP_CHECKSUM_MAGIC = 0xef;
 
-const USB_RAM_BLOCK = 0x800;
+const ESP_RAM_BLOCK = 0x1800;
 
 // Timeouts
 const DEFAULT_TIMEOUT = 3000; // timeout for most flash operations
@@ -86,6 +89,8 @@ export class EspLoader {
   private options: EspLoaderOptions;
   private serialPort: SerialPort;
   private isStub = false;
+
+  private baudRate = ESP_ROM_BAUD;
 
   private serialReaderClosed = false;
   private serialReader: ReadableStreamDefaultReader<Uint8Array> | undefined = undefined;
@@ -132,9 +137,8 @@ export class EspLoader {
       throw ConnectError;
     }
 
-    try {
-      await this.read(false, 200);
-    } catch (e) {}
+    await this.flushInput();
+    await this.chipFamily();
   }
 
   private async try_connect(): Promise<boolean> {
@@ -190,11 +194,26 @@ export class EspLoader {
     return;
   }
 
+  async crystalFrequency(): Promise<number> {
+    const uart_div = (await this.readRegister(UART_CLKDIV_REG)) & UART_CLKDIV_MASK;
+    const ets_xtal = (this.baudRate * uart_div) / 1000000 / 1;
+    let norm_xtal;
+    if (ets_xtal > 33) {
+      norm_xtal = 40;
+    } else {
+      norm_xtal = 26;
+    }
+    if (Math.abs(norm_xtal - ets_xtal) > 1) {
+      this.logger.debug("WARNING: Unsupported crystal in use");
+    }
+    return norm_xtal;
+  }
+
   /**
    * @name macAddr
    * Read MAC from OTP ROM
    */
-  async macAddr(): Promise<Uint8Array> {
+  async macAddr(): Promise<string> {
     const efuses = await this.efuses();
     const chipFamily = await this.chipFamily();
 
@@ -231,7 +250,12 @@ export class EspLoader {
     } else {
       throw UnknownChipFamilyError;
     }
-    return macAddr;
+
+    let res = macAddr[0].toString(16).toUpperCase().padStart(2, "0");
+    for (let i = 1; i < 6; i++) {
+      res += ":" + macAddr[i].toString(16).toUpperCase().padStart(2, "0");
+    }
+    return res;
   }
 
   /**
@@ -337,6 +361,7 @@ export class EspLoader {
 
   private _sendCommandBuffer = new Uint8BufferSlipEncode();
   private async sendCommand(opcode: number, buffer: Uint8Array, checksum = 0) {
+    this.readBuffer.reset();
     const packet = this._sendCommandBuffer;
     packet.reset();
     packet.push(0xc0, 0x00); // direction
@@ -363,6 +388,7 @@ export class EspLoader {
       }
       const opcode_ret = reply[1];
       if (opcode !== opcode_ret) {
+        this.logger.debug("invalid opcode response. expected", opcode, "got", opcode_ret);
         throw "invalid opcode response";
       }
       const res = Array.from<number>(reply);
@@ -400,12 +426,18 @@ export class EspLoader {
     // Reopen the port and read loop
     await this.serialPort.open({ baudRate: baud });
     await sleep(50);
-    try {
-      await this.read(false, 500);
-    } catch (e) {}
+    await this.flushInput();
 
     // Baud rate was changed
     this.logger.log("Changed baud rate to", baud);
+    this.baudRate = baud;
+  }
+
+  async flushInput(): Promise<void> {
+    try {
+      this.readBuffer.reset();
+      await this.read(false, 200);
+    } catch (e) {}
   }
 
   /**
@@ -519,7 +551,7 @@ export class EspLoader {
       buffer.pack("<I", encrypted ? 1 : 0);
     }
     this.logger.log(
-      "Erase size",
+      "Write size",
       eraseSize,
       " blocks ",
       numBlocks,
@@ -609,16 +641,9 @@ export class EspLoader {
     return await this.checkCommand(ESP_MEM_DATA, buffer.view(), EspLoader.checksum(data));
   }
 
-  private async memFinish(entrypoint = 0) {
-    const timeout = this.isStub ? DEFAULT_TIMEOUT : MEM_END_ROM_TIMEOUT;
+  private async memFinish(entrypoint = 0): Promise<void> {
     const data = pack("<II", entrypoint === 0 ? 1 : 0, entrypoint);
-    try {
-      return await this.checkCommand(ESP_MEM_END, data, 0, timeout);
-    } catch (e) {
-      if (this.isStub) {
-        throw e;
-      }
-    }
+    await this.checkCommand(ESP_MEM_END, data, 0, MEM_END_ROM_TIMEOUT);
   }
 
   /**
@@ -627,14 +652,13 @@ export class EspLoader {
    * @param stub Stub to load
    */
   async loadStub(stub?: Stub): Promise<void> {
-    // We're transferring over USB, right?
-    const ramBlock = USB_RAM_BLOCK;
+    const ramBlock = ESP_RAM_BLOCK;
 
     const writeMem = async (data: Uint8Array, offset: number) => {
       const length = data.length;
       const blocks = Math.floor((length + ramBlock - 1) / ramBlock);
       await this.memBegin(length, blocks, ramBlock, offset);
-      for (const seq of Array(blocks).keys()) {
+      for (let seq = 0; seq < blocks; seq++) {
         const fromOffs = seq * ramBlock;
         let toOffs = fromOffs + ramBlock;
         if (toOffs > length) {
@@ -674,8 +698,6 @@ export class EspLoader {
     let reader = this.serialPort.readable.getReader();
     this.serialReader = reader;
     this.serialReaderClosed = false;
-    this.readBuffer.reset();
-
     const chTimeout = setTimeout(async () => {
       try {
         this.serialReaderClosed = true;
@@ -723,22 +745,23 @@ export class EspLoader {
     minRead = 12
   ): Promise<Uint8Array> {
     while (true) {
-      do {
-        const { value, done } = await reader.read();
-        if (value) {
-          this.readBuffer.copy(value);
+      if (this.readBuffer.length >= minRead) {
+        if (packetMode) {
+          const res = this.readBuffer.packet(true);
+          if (res !== undefined) {
+            return res;
+          }
+        } else {
+          return this.readBuffer.view();
         }
-        if (done) {
-          throw ClosedError;
-        }
-      } while (this.readBuffer.length < minRead);
-      if (packetMode) {
-        const res = this.readBuffer.packet(true);
-        if (res !== undefined) {
-          return res;
-        }
-      } else {
-        return this.readBuffer.view();
+      }
+
+      const { value, done } = await reader.read();
+      if (value) {
+        this.readBuffer.copy(value);
+      }
+      if (done) {
+        throw ClosedError;
       }
     }
   }

@@ -118,8 +118,11 @@ export class Uint8Buffer {
       if (this._view[i] === 0xc0) {
         if (dataStart === undefined) {
           dataStart = i + 1;
+          // Empty package, normally because of wrong start marker.
+        } else if (dataStart === i) {
+          dataStart = i + 1;
         } else {
-          dataEnd = i - 1;
+          dataEnd = i;
           break;
         }
       }
@@ -127,12 +130,23 @@ export class Uint8Buffer {
     if (dataEnd === undefined || dataStart === undefined) {
       return undefined;
     }
+
     this.readOffset = dataEnd + 1;
-    return new Uint8Array(this._buffer, dataStart, dataEnd);
+
+    const res = new Uint8Array(this._buffer, dataStart, dataEnd - dataStart);
+
+    if (this.readOffset == this.writeOffset) {
+      this.reset();
+    }
+    return res;
   }
 
-  view(): Uint8Array {
-    return new Uint8Array(this._buffer, this.readOffset, this.writeOffset);
+  view(reset = true): Uint8Array {
+    const res = new Uint8Array(this._buffer, this.readOffset, this.writeOffset);
+    if (reset) {
+      this.reset();
+    }
+    return res;
   }
 }
 
