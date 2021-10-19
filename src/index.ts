@@ -752,7 +752,7 @@ export class EspLoader {
             return res;
           }
         } else {
-          return this.readBuffer.view(true);
+          return this.readBuffer.view();
         }
       }
 
