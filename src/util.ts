@@ -114,12 +114,11 @@ export class Uint8Buffer {
   packet(): Uint8Array | undefined {
     let dataStart: number | undefined;
     let dataEnd: number | undefined;
-    console.log("working on buffer", this.view(false))
     for (let i = this.readOffset; i < this.writeOffset; i++) {
       if (this._view[i] === 0xc0) {
         if (dataStart === undefined) {
           dataStart = i + 1;
-        // Empty package, normally because of wrong start marker.
+          // Empty package, normally because of wrong start marker.
         } else if (dataStart === i) {
           dataStart = i + 1;
         } else {
@@ -135,20 +134,10 @@ export class Uint8Buffer {
     this.readOffset = dataEnd + 1;
 
     const res = new Uint8Array(this._buffer, dataStart, dataEnd - dataStart);
-    console.log("got package", dataStart, dataEnd, "result", res)
 
-    const newSize = this.writeOffset - this.readOffset;
-    const newBuffer = new ArrayBuffer(newSize);
-    const newView = new Uint8Array(newBuffer);
-    newView.set(this._view.slice(this.readOffset, this.writeOffset), 0);
-    this.size = this.writeOffset - this.readOffset;
-    this.writeOffset -= this.readOffset;
-    this.readOffset = 0;
-    this._buffer = newBuffer;
-    this._view = newView;
-
-    console.log("new buffer", this.view(false));
-
+    if (this.readOffset == this.writeOffset) {
+      this.reset();
+    }
     return res;
   }
 

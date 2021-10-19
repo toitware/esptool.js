@@ -27,7 +27,7 @@ const ESP8266_DETECT_MAGIC_VALUE = 0xfff0c101;
 const ESP32S2_DETECT_MAGIC_VALUE = 0x000007c6;
 
 const UART_CLKDIV_REG = 0x3ff40014;
-const UART_CLKDIV_MASK = 0xFFFFF;
+const UART_CLKDIV_MASK = 0xfffff;
 
 // Commands supported by ESP8266 ROM bootloader
 const ESP_FLASH_BEGIN = 0x02;
@@ -137,12 +137,8 @@ export class EspLoader {
       throw ConnectError;
     }
 
-    try {
-      this.readBuffer.reset()
-      await this.read(false, 200);
-    } catch (e) {}
-
-    await this.chipFamily()
+    await this.flushInput();
+    await this.chipFamily();
   }
 
   private async try_connect(): Promise<boolean> {
@@ -199,18 +195,18 @@ export class EspLoader {
   }
 
   async crystalFrequency(): Promise<number> {
-      var uart_div = await this.readRegister(UART_CLKDIV_REG) & UART_CLKDIV_MASK;
-      var ets_xtal = (this.baudRate * uart_div) / 1000000 / 1;
-      var norm_xtal;
-      if (ets_xtal > 33) {
-          norm_xtal = 40;
-      } else {
-          norm_xtal = 26;
-      }
-      if (Math.abs(norm_xtal - ets_xtal) > 1) {
-          this.logger.debug("WARNING: Unsupported crystal in use");
-      }
-      return norm_xtal;
+    const uart_div = (await this.readRegister(UART_CLKDIV_REG)) & UART_CLKDIV_MASK;
+    const ets_xtal = (this.baudRate * uart_div) / 1000000 / 1;
+    let norm_xtal;
+    if (ets_xtal > 33) {
+      norm_xtal = 40;
+    } else {
+      norm_xtal = 26;
+    }
+    if (Math.abs(norm_xtal - ets_xtal) > 1) {
+      this.logger.debug("WARNING: Unsupported crystal in use");
+    }
+    return norm_xtal;
   }
 
   /**
@@ -255,9 +251,9 @@ export class EspLoader {
       throw UnknownChipFamilyError;
     }
 
-    let res = macAddr[0].toString(16).toUpperCase().padStart(2, "0")
+    let res = macAddr[0].toString(16).toUpperCase().padStart(2, "0");
     for (let i = 1; i < 6; i++) {
-      res += ":" + macAddr[i].toString(16).toUpperCase().padStart(2, "0")
+      res += ":" + macAddr[i].toString(16).toUpperCase().padStart(2, "0");
     }
     return res;
   }
@@ -430,15 +426,18 @@ export class EspLoader {
     // Reopen the port and read loop
     await this.serialPort.open({ baudRate: baud });
     await sleep(50);
-    try {
-      while (true) {
-        await this.read(false, 200);
-      }
-    } catch (e) {}
+    await this.flushInput();
 
     // Baud rate was changed
     this.logger.log("Changed baud rate to", baud);
     this.baudRate = baud;
+  }
+
+  async flushInput(): Promise<void> {
+    try {
+      this.readBuffer.reset();
+      await this.read(false, 200);
+    } catch (e) {}
   }
 
   /**
