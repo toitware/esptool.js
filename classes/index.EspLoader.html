@@ -97,10 +97,8 @@
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#baudRate" class="tsd-kind-icon">baud<wbr>Rate</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#isStub" class="tsd-kind-icon">is<wbr>Stub</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#options" class="tsd-kind-icon">options</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#readBuffer" class="tsd-kind-icon">read<wbr>Buffer</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#reader" class="tsd-kind-icon">reader</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#serialPort" class="tsd-kind-icon">serial<wbr>Port</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#serialReader" class="tsd-kind-icon">serial<wbr>Reader</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#serialReaderClosed" class="tsd-kind-icon">serial<wbr>Reader<wbr>Closed</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-private tsd-is-private-protected">
@@ -112,7 +110,6 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#_read" class="tsd-kind-icon">_read</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#checkCommand" class="tsd-kind-icon">check<wbr>Command</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="index.EspLoader.html#chipFamily" class="tsd-kind-icon">chip<wbr>Family</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="index.EspLoader.html#chipName" class="tsd-kind-icon">chip<wbr>Name</a></li>
@@ -125,7 +122,6 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#flashBlock" class="tsd-kind-icon">flash<wbr>Block</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="index.EspLoader.html#flashData" class="tsd-kind-icon">flash<wbr>Data</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="index.EspLoader.html#flashFinish" class="tsd-kind-icon">flash<wbr>Finish</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="index.EspLoader.html#flushInput" class="tsd-kind-icon">flush<wbr>Input</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#getFlashWriteSize" class="tsd-kind-icon">get<wbr>Flash<wbr>Write<wbr>Size</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#getResponse" class="tsd-kind-icon">get<wbr>Response</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="index.EspLoader.html#loadStub" class="tsd-kind-icon">load<wbr>Stub</a></li>
@@ -133,7 +129,6 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#memBegin" class="tsd-kind-icon">mem<wbr>Begin</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#memBlock" class="tsd-kind-icon">mem<wbr>Block</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#memFinish" class="tsd-kind-icon">mem<wbr>Finish</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#read" class="tsd-kind-icon">read</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#readEfuses" class="tsd-kind-icon">read<wbr>Efuses</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#readRegister" class="tsd-kind-icon">read<wbr>Register</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="index.EspLoader.html#sendCommand" class="tsd-kind-icon">send<wbr>Command</a></li>
@@ -160,7 +155,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L98">index.ts:98</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L93">index.ts:93</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -185,7 +180,7 @@
 					<div class="tsd-signature tsd-kind-icon">_chipfamily<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../enums/index.ChipFamily.html" class="tsd-signature-type" data-tsd-kind="Enumeration">ChipFamily</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L86">index.ts:86</a></li>
+							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L82">index.ts:82</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -195,7 +190,7 @@
 					<div class="tsd-signature tsd-kind-icon">_efuses<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Uint32Array</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L87">index.ts:87</a></li>
+							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L83">index.ts:83</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -205,7 +200,7 @@
 					<div class="tsd-signature tsd-kind-icon">_flash<wbr>Block<wbr>Buffer<span class="tsd-signature-symbol">:</span> <a href="util.Uint8Buffer.html" class="tsd-signature-type" data-tsd-kind="Class">Uint8Buffer</a><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L508">index.ts:508</a></li>
+							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L505">index.ts:505</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -215,7 +210,7 @@
 					<div class="tsd-signature tsd-kind-icon">_mem<wbr>Block<wbr>Buffer<span class="tsd-signature-symbol">:</span> <a href="util.Uint8Buffer.html" class="tsd-signature-type" data-tsd-kind="Class">Uint8Buffer</a><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L635">index.ts:635</a></li>
+							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L632">index.ts:632</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -225,7 +220,7 @@
 					<div class="tsd-signature tsd-kind-icon">_send<wbr>Command<wbr>Buffer<span class="tsd-signature-symbol">:</span> <a href="util.Uint8BufferSlipEncode.html" class="tsd-signature-type" data-tsd-kind="Class">Uint8BufferSlipEncode</a><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L362">index.ts:362</a></li>
+							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L358">index.ts:358</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -235,7 +230,7 @@
 					<div class="tsd-signature tsd-kind-icon">baud<wbr>Rate<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L93">index.ts:93</a></li>
+							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L89">index.ts:89</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -245,7 +240,7 @@
 					<div class="tsd-signature tsd-kind-icon">is<wbr>Stub<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L91">index.ts:91</a></li>
+							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L87">index.ts:87</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -255,17 +250,17 @@
 					<div class="tsd-signature tsd-kind-icon">options<span class="tsd-signature-symbol">:</span> <a href="../modules/index.html#EspLoaderOptions" class="tsd-signature-type" data-tsd-kind="Type alias">EspLoaderOptions</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L89">index.ts:89</a></li>
+							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L85">index.ts:85</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="readBuffer" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> read<wbr>Buffer</h3>
-					<div class="tsd-signature tsd-kind-icon">read<wbr>Buffer<span class="tsd-signature-symbol">:</span> <a href="util.Uint8BufferSlipEncode.html" class="tsd-signature-type" data-tsd-kind="Class">Uint8BufferSlipEncode</a><span class="tsd-signature-symbol"> = ...</span></div>
+					<a name="reader" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> reader</h3>
+					<div class="tsd-signature tsd-kind-icon">reader<span class="tsd-signature-symbol">:</span> <a href="reader.Reader.html" class="tsd-signature-type" data-tsd-kind="Class">Reader</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L693">index.ts:693</a></li>
+							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L91">index.ts:91</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -275,27 +270,7 @@
 					<div class="tsd-signature tsd-kind-icon">serial<wbr>Port<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">SerialPort</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L90">index.ts:90</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="serialReader" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> serial<wbr>Reader</h3>
-					<div class="tsd-signature tsd-kind-icon">serial<wbr>Reader<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ReadableStreamDefaultReader</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L96">index.ts:96</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="serialReaderClosed" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> serial<wbr>Reader<wbr>Closed</h3>
-					<div class="tsd-signature tsd-kind-icon">serial<wbr>Reader<wbr>Closed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L95">index.ts:95</a></li>
+							<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L86">index.ts:86</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -312,7 +287,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L110">index.ts:110</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L106">index.ts:106</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/index.Logger.html" class="tsd-signature-type" data-tsd-kind="Interface">Logger</a></h4>
@@ -323,35 +298,6 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
-					<a name="_read" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _read</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
-						<li class="tsd-signature tsd-kind-icon">_read<span class="tsd-signature-symbol">(</span>reader<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReadableStreamDefaultReader</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span>, packetMode<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span>, minRead<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L742">index.ts:742</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>reader: <span class="tsd-signature-type">ReadableStreamDefaultReader</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span></h5>
-								</li>
-								<li>
-									<h5>packetMode: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></h5>
-								</li>
-								<li>
-									<h5>minRead: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 12</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
 					<a name="checkCommand" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> check<wbr>Command</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
@@ -361,7 +307,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L344">index.ts:344</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L335">index.ts:335</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -398,7 +344,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L303">index.ts:303</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L294">index.ts:294</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -420,7 +366,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L322">index.ts:322</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L313">index.ts:313</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -442,7 +388,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L127">index.ts:127</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L123">index.ts:123</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -471,7 +417,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L197">index.ts:197</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L188">index.ts:188</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -488,7 +434,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L183">index.ts:183</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L181">index.ts:181</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -510,7 +456,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L281">index.ts:281</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L272">index.ts:272</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint32Array</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -527,7 +473,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L774">index.ts:774</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L699">index.ts:699</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -558,7 +504,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L520">index.ts:520</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L517">index.ts:517</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -587,7 +533,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L509">index.ts:509</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L506">index.ts:506</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -619,7 +565,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L466">index.ts:466</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L463">index.ts:463</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -656,7 +602,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L574">index.ts:574</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L571">index.ts:571</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -677,23 +623,6 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="flushInput" class="tsd-anchor"></a>
-					<h3>flush<wbr>Input</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">flush<wbr>Input<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L436">index.ts:436</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
-				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
 					<a name="getFlashWriteSize" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> get<wbr>Flash<wbr>Write<wbr>Size</h3>
@@ -704,7 +633,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L456">index.ts:456</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L453">index.ts:453</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -721,7 +650,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L383">index.ts:383</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L378">index.ts:378</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -747,7 +676,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L654">index.ts:654</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L651">index.ts:651</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -778,7 +707,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L216">index.ts:216</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L207">index.ts:207</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -803,7 +732,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L602">index.ts:602</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L599">index.ts:599</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -835,7 +764,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L636">index.ts:636</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L633">index.ts:633</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -861,7 +790,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L644">index.ts:644</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L641">index.ts:641</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -875,35 +804,6 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
-					<a name="read" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> read</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
-						<li class="tsd-signature tsd-kind-icon">read<span class="tsd-signature-symbol">(</span>packetMode<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span>, timeoutMs<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, minRead<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L694">index.ts:694</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>packetMode: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></h5>
-								</li>
-								<li>
-									<h5>timeoutMs: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 1000</span></h5>
-								</li>
-								<li>
-									<h5>minRead: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 12</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
 					<a name="readEfuses" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> read<wbr>Efuses</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
@@ -913,7 +813,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L264">index.ts:264</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L255">index.ts:255</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -935,7 +835,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L291">index.ts:291</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L282">index.ts:282</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -963,7 +863,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L363">index.ts:363</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L359">index.ts:359</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -992,7 +892,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L416">index.ts:416</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L411">index.ts:411</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1023,7 +923,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L447">index.ts:447</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L439">index.ts:439</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1046,7 +946,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L144">index.ts:144</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L144">index.ts:144</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -1063,7 +963,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L114">index.ts:114</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L110">index.ts:110</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1086,7 +986,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L406">index.ts:406</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L401">index.ts:401</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1112,7 +1012,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/a05a171/src/index.ts#L584">index.ts:584</a></li>
+									<li>Defined in <a href="https://github.com/toitware/esptool.js/blob/bdc425f/src/index.ts#L581">index.ts:581</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1142,8 +1042,14 @@
 					<li class=" ">
 						<a href="../modules.html">Modules</a>
 					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/errors.html">errors</a>
+					</li>
 					<li class="current tsd-kind-module">
 						<a href="../modules/index.html">index</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/reader.html">reader</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/stubs.html">stubs</a>
@@ -1191,22 +1097,13 @@
 								<a href="index.EspLoader.html#options" class="tsd-kind-icon">options</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="index.EspLoader.html#readBuffer" class="tsd-kind-icon">read<wbr>Buffer</a>
+								<a href="index.EspLoader.html#reader" class="tsd-kind-icon">reader</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="index.EspLoader.html#serialPort" class="tsd-kind-icon">serial<wbr>Port</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="index.EspLoader.html#serialReader" class="tsd-kind-icon">serial<wbr>Reader</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="index.EspLoader.html#serialReaderClosed" class="tsd-kind-icon">serial<wbr>Reader<wbr>Closed</a>
-							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-private">
 								<a href="index.EspLoader.html#logger" class="tsd-kind-icon">logger</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
-								<a href="index.EspLoader.html#_read" class="tsd-kind-icon">_read</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
 								<a href="index.EspLoader.html#checkCommand" class="tsd-kind-icon">check<wbr>Command</a>
@@ -1244,9 +1141,6 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="index.EspLoader.html#flashFinish" class="tsd-kind-icon">flash<wbr>Finish</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="index.EspLoader.html#flushInput" class="tsd-kind-icon">flush<wbr>Input</a>
-							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
 								<a href="index.EspLoader.html#getFlashWriteSize" class="tsd-kind-icon">get<wbr>Flash<wbr>Write<wbr>Size</a>
 							</li>
@@ -1267,9 +1161,6 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
 								<a href="index.EspLoader.html#memFinish" class="tsd-kind-icon">mem<wbr>Finish</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
-								<a href="index.EspLoader.html#read" class="tsd-kind-icon">read</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
 								<a href="index.EspLoader.html#readEfuses" class="tsd-kind-icon">read<wbr>Efuses</a>
@@ -1321,14 +1212,15 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
-				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
