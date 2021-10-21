@@ -161,7 +161,7 @@ export class EspLoader {
     for (let i = 0; i < 7; i++) {
       try {
         if (await this.sync()) {
-          this.options.logger.log("synced with bootloader")
+          this.options.logger.log("synced with bootloader");
           return true;
         }
       } catch (e) {

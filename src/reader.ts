@@ -52,7 +52,7 @@ export class Reader {
       await this.runPromise;
       return undefined;
     } catch (e) {
-      return e as unknown;
+      return e;
     } finally {
       this.buffer.reset();
       this.runPromise = undefined;
@@ -99,6 +99,7 @@ export class Reader {
           } catch (e) {}
           reader.releaseLock();
           this.reader = undefined;
+          await sleep(1);
         }
       }
     } finally {
