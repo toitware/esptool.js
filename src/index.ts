@@ -124,6 +124,9 @@ export class EspLoader {
     this.reader.start(this.serialPort.readable);
     let connected = false;
     for (let i = 0; i < retries; i++) {
+      if (i > 0) {
+        this.options.logger.log("retrying...");
+      }
       if (await this.try_connect()) {
         connected = true;
         break;
@@ -148,14 +151,17 @@ export class EspLoader {
     // Wait until device has stable output.
     const wasSilent = await this.reader.waitSilent(20, 1000);
     if (!wasSilent) {
-      this.options.logger.debug("try_connect reader was not silent");
+      this.options.logger.log("failed to enter bootloader");
+      return false;
     }
+    this.options.logger.log("trying to sync with bootloader...");
 
     // Try sync.
     this.options.logger.debug("sync started");
     for (let i = 0; i < 7; i++) {
       try {
         if (await this.sync()) {
+          this.options.logger.log("synced with bootloader")
           return true;
         }
       } catch (e) {
@@ -165,6 +171,7 @@ export class EspLoader {
     }
     this.options.logger.debug("sync stopped");
 
+    this.options.logger.log("failed to sync with bootloader");
     return false;
   }
 

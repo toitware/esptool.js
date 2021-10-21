@@ -66,11 +66,12 @@ export class Reader {
         if (this.reader === undefined) {
           this.reader = readable.getReader();
         }
+        const reader = this.reader;
         try {
-          const { value, done } = await this.reader.read();
+          const { value, done } = await reader.read();
 
           if (done) {
-            this.reader.releaseLock();
+            reader.releaseLock();
             this.reader = undefined;
             await sleep(1);
             continue;
@@ -91,6 +92,13 @@ export class Reader {
           if (!isTransientError(e)) {
             throw e;
           }
+
+          // on a transient error, close the current reader and retry.
+          try {
+            await reader.cancel();
+          } catch (e) {}
+          reader.releaseLock();
+          this.reader = undefined;
         }
       }
     } finally {
