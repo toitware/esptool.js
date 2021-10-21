@@ -3,7 +3,9 @@
 // found in the LICENSE file.
 
 import { ESP32, Stub } from "./stubs";
-import { isTransientError, sleep, toByteArray, toHex, Uint8Buffer, Uint8BufferSlipEncode } from "./util";
+import { sleep, toByteArray, toHex, Uint8Buffer, Uint8BufferSlipEncode } from "./util";
+import { UnknownChipFamilyError, ConnectError } from "./errors";
+import { Reader } from "./reader";
 
 export enum ChipFamily {
   ESP32 = "esp32",
@@ -50,7 +52,7 @@ const ESP_RAM_BLOCK = 0x1800;
 
 // Timeouts
 const DEFAULT_TIMEOUT = 3000; // timeout for most flash operations
-const CHIP_ERASE_TIMEOUT = 300000; // timeout for full chip erase
+const CHIP_ERASE_TIMEOUT = 120000; // timeout for full chip erase
 const MAX_TIMEOUT = CHIP_ERASE_TIMEOUT * 2; // longest any command can run
 const SYNC_TIMEOUT = 100; // timeout for syncing with bootloader
 const ERASE_REGION_TIMEOUT_PER_MB = 30000; // timeout (per megabyte) for erasing a region
@@ -75,12 +77,6 @@ interface commandResult {
 
 type progressCallback = (i: number, total: number) => void;
 
-const UnknownChipFamilyError = "Unknown chip family";
-const ClosedError = "closed";
-const TimeoutError = "timeout";
-const ConnectError = "connect error";
-const ReadAlreadyInProgressError = "Read already in progress";
-
 export class EspLoader {
   // caches
   private _chipfamily: ChipFamily | undefined;
@@ -92,8 +88,7 @@ export class EspLoader {
 
   private baudRate = ESP_ROM_BAUD;
 
-  private serialReaderClosed = false;
-  private serialReader: ReadableStreamDefaultReader<Uint8Array> | undefined = undefined;
+  private reader: Reader;
 
   constructor(serialPort: SerialPort, options?: Partial<EspLoaderOptions>) {
     this.options = Object.assign(
@@ -104,6 +99,7 @@ export class EspLoader {
       },
       options || {}
     );
+    this.reader = new Reader();
     this.serialPort = serialPort;
   }
 
@@ -125,6 +121,7 @@ export class EspLoader {
    * ESP ROM bootloader, we will retry a few times
    */
   async connect(retries = 7): Promise<void> {
+    this.reader.start(this.serialPort.readable);
     let connected = false;
     for (let i = 0; i < retries; i++) {
       if (await this.try_connect()) {
@@ -137,32 +134,25 @@ export class EspLoader {
       throw ConnectError;
     }
 
-    await this.flushInput();
+    await this.reader.waitSilent(1, 200);
     await this.chipFamily();
   }
 
   private async try_connect(): Promise<boolean> {
-    await this.serialPort.setSignals({ dataTerminalReady: false });
-    await this.serialPort.setSignals({ requestToSend: true });
+    await this.serialPort.setSignals({ dataTerminalReady: false, requestToSend: true });
     await sleep(100);
-    await this.serialPort.setSignals({ dataTerminalReady: true });
-    await this.serialPort.setSignals({ requestToSend: false });
+    await this.serialPort.setSignals({ dataTerminalReady: true, requestToSend: false });
     await sleep(50);
-    await this.serialPort.setSignals({ dataTerminalReady: false });
+    await this.serialPort.setSignals({ dataTerminalReady: false, requestToSend: false });
 
     // Wait until device has stable output.
-    for (let i = 0; i < 20; i++) {
-      try {
-        await this.read(false, 1000);
-      } catch (e) {
-        if (e === TimeoutError) {
-          break;
-        }
-      }
-      await sleep(50);
+    const wasSilent = await this.reader.waitSilent(20, 1000);
+    if (!wasSilent) {
+      this.options.logger.debug("try_connect reader was not silent");
     }
 
     // Try sync.
+    this.options.logger.debug("sync started");
     for (let i = 0; i < 7; i++) {
       try {
         if (await this.sync()) {
@@ -173,6 +163,7 @@ export class EspLoader {
       }
       await sleep(50);
     }
+    this.options.logger.debug("sync stopped");
 
     return false;
   }
@@ -181,17 +172,10 @@ export class EspLoader {
    * shutdown the read loop.
    */
   async disconnect(): Promise<void> {
-    const reader = this.serialReader;
-    if (reader) {
-      try {
-        this.serialReaderClosed = true;
-        await reader.cancel();
-        await reader.closed;
-      } catch (e) {
-        //ignore cancel errors.
-      }
+    const err = await this.reader.stop();
+    if (err !== undefined) {
+      throw err;
     }
-    return;
   }
 
   async crystalFrequency(): Promise<number> {
@@ -348,20 +332,24 @@ export class EspLoader {
     timeout: number = DEFAULT_TIMEOUT
   ): Promise<number[]> {
     timeout = Math.min(timeout, MAX_TIMEOUT);
-    await this.sendCommand(opcode, buffer, checksum);
-    const resp = await this.getResponse(opcode, timeout);
-    const data = resp.data;
-    const value = resp.value;
-    if (data.length > 4) {
-      return data;
-    } else {
-      return value;
+    const unlisten = this.reader.listen();
+    try {
+      await this.sendCommand(opcode, buffer, checksum);
+      const resp = await this.getResponse(opcode, timeout);
+      const data = resp.data;
+      const value = resp.value;
+      if (data.length > 4) {
+        return data;
+      } else {
+        return value;
+      }
+    } finally {
+      unlisten();
     }
   }
 
   private _sendCommandBuffer = new Uint8BufferSlipEncode();
   private async sendCommand(opcode: number, buffer: Uint8Array, checksum = 0) {
-    this.readBuffer.reset();
     const packet = this._sendCommandBuffer;
     packet.reset();
     packet.push(0xc0, 0x00); // direction
@@ -382,7 +370,7 @@ export class EspLoader {
 
   private async getResponse(opcode: number, timeout: number = DEFAULT_TIMEOUT): Promise<commandResult> {
     try {
-      const reply = await this.read(true, timeout);
+      const reply = await this.reader.packet(12, timeout);
       if (this.options.debug) {
         this.logger.debug("Reading", reply.length, "byte" + (reply.length == 1 ? "" : "s") + ":", reply);
       }
@@ -425,19 +413,16 @@ export class EspLoader {
 
     // Reopen the port and read loop
     await this.serialPort.open({ baudRate: baud });
+    this.reader.start(this.serialPort.readable);
     await sleep(50);
-    await this.flushInput();
+    const wasSilent = await this.reader.waitSilent(10, 200);
+    if (!wasSilent) {
+      this.logger.debug("after baud change reader was not silent");
+    }
 
     // Baud rate was changed
     this.logger.log("Changed baud rate to", baud);
     this.baudRate = baud;
-  }
-
-  async flushInput(): Promise<void> {
-    try {
-      this.readBuffer.reset();
-      await this.read(false, 200);
-    } catch (e) {}
   }
 
   /**
@@ -445,12 +430,17 @@ export class EspLoader {
    * ESP ROM bootloader, we will retry a few times
    */
   private async sync(): Promise<boolean> {
-    await this.sendCommand(ESP_SYNC, SYNC_PACKET);
-    const { data } = await this.getResponse(ESP_SYNC, SYNC_TIMEOUT);
-    if (data.length > 1 && data[0] == 0 && data[1] == 0) {
-      return true;
+    const unlisten = this.reader.listen();
+    try {
+      await this.sendCommand(ESP_SYNC, SYNC_PACKET);
+      const { data } = await this.getResponse(ESP_SYNC, SYNC_TIMEOUT);
+      if (data.length > 1 && data[0] == 0 && data[1] == 0) {
+        return true;
+      }
+      return false;
+    } finally {
+      unlisten();
     }
-    return false;
   }
 
   private getFlashWriteSize(): number {
@@ -677,93 +667,21 @@ export class EspLoader {
     await writeMem(stub.text, stub.textStart);
     await writeMem(stub.data, stub.dataStart);
     this.logger.log("Running stub...");
-    await this.memFinish(stub.entry);
-
-    const p = await this.read(true, 1000, 6);
-    const str = String.fromCharCode(...p);
-    if (str !== "OHAI") {
-      throw "Failed to start stub. Unexpected response: " + str;
+    const unlisten = this.reader.listen();
+    try {
+      await this.memFinish(stub.entry);
+      const p = await this.reader.packet(6, 1000);
+      const str = String.fromCharCode(...p);
+      if (str !== "OHAI") {
+        throw "Failed to start stub. Unexpected response: " + str;
+      }
+    } finally {
+      unlisten();
     }
     this.logger.log("Stub is now running...");
     this.isStub = true;
     this._chipfamily = undefined;
     this._efuses = undefined;
-  }
-
-  private readBuffer = new Uint8BufferSlipEncode();
-  private async read(packetMode = true, timeoutMs = 1000, minRead = 12): Promise<Uint8Array> {
-    if (this.serialReader !== undefined) {
-      throw ReadAlreadyInProgressError;
-    }
-    let reader = this.serialPort.readable.getReader();
-    this.serialReader = reader;
-    this.serialReaderClosed = false;
-    const chTimeout = setTimeout(async () => {
-      try {
-        this.serialReaderClosed = true;
-        await reader.cancel();
-      } catch (e) {
-        // Ignore cancel errors.
-      }
-    }, timeoutMs);
-
-    try {
-      while (true) {
-        if (this.serialReaderClosed) {
-          throw TimeoutError;
-        }
-
-        try {
-          return await this._read(reader, packetMode, minRead);
-        } catch (e) {
-          if (e === ClosedError) {
-            reader.releaseLock();
-            await sleep(1);
-            reader = this.serialPort.readable.getReader();
-            this.serialReader = reader;
-          } else if (!isTransientError(e)) {
-            throw e;
-          }
-        }
-      }
-    } finally {
-      clearTimeout(chTimeout);
-      try {
-        await reader.cancel();
-      } catch (e) {
-        // ignore cancel errors.
-      }
-      reader.releaseLock();
-      this.serialReader = undefined;
-      this.serialReaderClosed = false;
-    }
-  }
-
-  private async _read(
-    reader: ReadableStreamDefaultReader<Uint8Array>,
-    packetMode = true,
-    minRead = 12
-  ): Promise<Uint8Array> {
-    while (true) {
-      if (this.readBuffer.length >= minRead) {
-        if (packetMode) {
-          const res = this.readBuffer.packet(true);
-          if (res !== undefined) {
-            return res;
-          }
-        } else {
-          return this.readBuffer.view();
-        }
-      }
-
-      const { value, done } = await reader.read();
-      if (value) {
-        this.readBuffer.copy(value);
-      }
-      if (done) {
-        throw ClosedError;
-      }
-    }
   }
 
   /**
