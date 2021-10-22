@@ -13,28 +13,35 @@ import {
 
 export type Unlisten = () => void;
 
+export interface ReadableOwner {
+  readonly readable: ReadableStream<Uint8Array>;
+}
+
 export class Reader {
   private buffer: Uint8Buffer;
+  private readableOwner: ReadableOwner;
 
   private running = false;
   private closing = false;
+
   private reader: ReadableStreamDefaultReader<Uint8Array> | undefined = undefined;
   private completer: Completer<void> | undefined = undefined;
   private runPromise: Promise<void> | undefined = undefined;
   private listenRef = 0;
 
-  public constructor() {
+  public constructor(readableOwner: ReadableOwner) {
     this.buffer = new Uint8Buffer();
+    this.readableOwner = readableOwner;
   }
 
-  public start(readable: ReadableStream<Uint8Array>): void {
+  public start(): void {
     if (this.runPromise !== undefined) {
       throw AlreadyRunningError;
     }
 
     this.buffer.reset();
     this.closing = false;
-    this.runPromise = this.run(readable);
+    this.runPromise = this.run();
   }
 
   public async stop(): Promise<unknown> {
@@ -59,12 +66,12 @@ export class Reader {
     }
   }
 
-  private async run(readable: ReadableStream<Uint8Array>): Promise<void> {
+  private async run(): Promise<void> {
     try {
       this.running = true;
       while (!this.closing) {
         if (this.reader === undefined) {
-          this.reader = readable.getReader();
+          this.reader = this.readableOwner.readable.getReader();
         }
         const reader = this.reader;
         try {

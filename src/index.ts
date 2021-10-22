@@ -99,7 +99,7 @@ export class EspLoader {
       },
       options || {}
     );
-    this.reader = new Reader();
+    this.reader = new Reader(serialPort);
     this.serialPort = serialPort;
   }
 
@@ -121,7 +121,7 @@ export class EspLoader {
    * ESP ROM bootloader, we will retry a few times
    */
   async connect(retries = 7): Promise<void> {
-    this.reader.start(this.serialPort.readable);
+    this.reader.start();
     let connected = false;
     for (let i = 0; i < retries; i++) {
       if (i > 0) {
@@ -420,7 +420,7 @@ export class EspLoader {
 
     // Reopen the port and read loop
     await this.serialPort.open({ baudRate: baud });
-    this.reader.start(this.serialPort.readable);
+    this.reader.start();
     await sleep(50);
     const wasSilent = await this.reader.waitSilent(10, 200);
     if (!wasSilent) {
