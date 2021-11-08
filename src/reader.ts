@@ -184,13 +184,16 @@ export class Reader {
     if (this.listenRef <= 0) {
       throw NotListeningError;
     }
+    const deadline = Date.now() + timeoutMs;
     while (true) {
-      await this.waitData(minLength, timeoutMs);
+      await this.waitData(minLength, deadline - Date.now());
 
       const res = this.buffer.packet();
       if (res !== undefined) {
         return res;
       }
+      // no packet was available in minLength, so we wait for another byte.
+      minLength++;
     }
   }
 }
