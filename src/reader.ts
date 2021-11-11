@@ -3,9 +3,11 @@
 // found in the LICENSE file.
 
 import {
-  AlreadyRunningError, NotListeningError, NotRunningError,
+  AlreadyRunningError,
+  NotListeningError,
+  NotRunningError,
   ReadAlreadyInProgressError,
-  TimeoutError
+  TimeoutError,
 } from "./errors";
 import { isTransientError, sleep, Uint8Buffer } from "./util";
 
@@ -194,7 +196,7 @@ export class Reader {
       minLength++;
     }
 
-    throw TimeoutError
+    throw TimeoutError;
   }
 }
 
