@@ -2,10 +2,10 @@
 // Use of this source code is governed by an MIT-style license that can be
 // found in the LICENSE file.
 
+import { ConnectError, UnknownChipFamilyError } from "./errors";
+import { Reader } from "./reader";
 import { ESP32, Stub } from "./stubs";
 import { sleep, toByteArray, toHex, Uint8Buffer, Uint8BufferSlipEncode } from "./util";
-import { UnknownChipFamilyError, ConnectError } from "./errors";
-import { Reader } from "./reader";
 
 export enum ChipFamily {
   ESP32 = "esp32",

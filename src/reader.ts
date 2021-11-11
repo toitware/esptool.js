@@ -2,14 +2,14 @@
 // Use of this source code is governed by an MIT-style license that can be
 // found in the LICENSE file.
 
-import { isTransientError, Uint8Buffer, sleep } from "./util";
 import {
   AlreadyRunningError,
+  NotListeningError,
   NotRunningError,
   ReadAlreadyInProgressError,
   TimeoutError,
-  NotListeningError,
 } from "./errors";
+import { isTransientError, sleep, Uint8Buffer } from "./util";
 
 export type Unlisten = () => void;
 
@@ -184,9 +184,9 @@ export class Reader {
     if (this.listenRef <= 0) {
       throw NotListeningError;
     }
-    const deadline = Date.now() + timeoutMs;
-    while (true) {
-      await this.waitData(minLength, deadline - Date.now());
+    let maxRetries = 1000;
+    while (maxRetries--) {
+      await this.waitData(minLength, timeoutMs);
 
       const res = this.buffer.packet();
       if (res !== undefined) {
@@ -195,6 +195,8 @@ export class Reader {
       // no packet was available in minLength, so we wait for another byte.
       minLength++;
     }
+
+    throw TimeoutError;
   }
 }
 
